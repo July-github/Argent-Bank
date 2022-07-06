@@ -110,6 +110,157 @@ paths:
           description: Invalid Fields
         '500':
           description: Internal Server Error
+  /user/profile/transactionsMonth:
+    parameters:
+      - in: header
+        name: Authorization
+        description: Attach Bearer JWT token
+        required: true
+        type: string
+    get:
+      security:
+        - Bearer: []
+      tags:
+      - Transactions Module
+      summary: User's transactions of the month
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: user transactions for the current month retrieved successfully
+          schema:
+            $ref: '#/definitions/TransactionResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized - the request requires user authentication
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+        default:
+          description: Unexpected error
+  /user/profile/transactionsMonth/{transaction_id}:
+    parameters:
+      - name: transaction_id
+        in: path
+        required: true
+        description: User's transaction ID
+        type: integer
+      - in: header
+        name: Authorization
+        description: Attach Bearer JWT token
+        required: true
+        type: string
+    get:   
+      tags:
+      - Transactions Module
+      summary: User's specific transaction details
+      security:
+        - Bearer: []
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: user transaction retrieved successfully
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TransactionDetailedResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized - the request requires user authentication
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+        default:
+          description: Unexpected error
+  /user/profile/transactions/{transaction_id}/transaction_category:
+    parameters:
+      - name: transaction_id
+        in: path
+        required: true
+        description: User's transaction ID
+        type: integer
+      - in: header
+        name: Authorization
+        description: Attach Bearer JWT token
+        required: true
+        type: string
+    put:
+      tags:
+      - Transactions Module
+      summary: User specific transaction's category API
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          description: Category payload
+          required: true
+          schema:
+            $ref: '#/definitions/TransactionCategory'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: user transaction category successfully updated
+          schema:
+            $ref: '#/definitions/TransactionCategory'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized - the request requires user authentication
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+        default:
+          description: Unexpected error
+  /user/profile/transactions/{transaction_id}/transaction_notes:
+    parameters:
+      - in: header
+        name: Authorization
+        description: Attach Bearer JWT token
+        required: true
+        type: string
+      - name: transaction_id
+        in: path
+        required: true
+        description: User's transaction ID
+        type: integer
+    put:
+      tags:
+      - Transactions Module
+      summary: User specific transaction's notes API
+      security:
+        - Bearer: []
+      parameters:
+      - name: body
+        in: body
+        required: true
+        description: Notes payload
+        schema:
+          $ref: '#/definitions/TransactionNotes'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: user transaction notes successfully modified
+          schema:
+            $ref: '#/definitions/TransactionNotes'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized - the request requires user authentication
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+        default:
+          description: Unexpected error
 securityDefinitions:
   Bearer:
     type: apiKey
@@ -164,3 +315,75 @@ definitions:
         type: string
       lastName:
         type: string
+  Transaction:
+    type: object
+    properties:
+      account_title:
+        type: string
+        example: Argent Bank Checking
+      account_balance:
+        type: number
+        example: 1 973
+      transaction_id:
+        type: integer
+        example: 3 801
+      transaction_date:
+        type: string
+        example: June 20th, 2020
+      transaction_description: 
+        type: string
+        example: Golden Sun Bakery
+      transaction_amount:
+        type: number
+        example: 345
+  ExtraTransactionInfos:
+    type: object
+    properties:
+      transaction_id:
+        type: integer
+        example: 3 801
+      transaction_type:
+        type: string
+        example: Electronic
+      transaction_category:
+        type: string
+        example: Food
+      transaction_notes:
+        type: string
+        example: dad's gift
+  TransactionNotes:
+    type : object
+    properties:
+      transaction_notes:
+        type : string
+        example: Dad's gift
+  TransactionCategory:      
+    type: "object"
+    properties:
+      transaction_category: 
+        type: string
+        example: Hobby
+  TransactionResponse:
+    type: object
+    properties:
+      status: 
+        type: integer
+        example: 200
+      message:
+        type: string
+        example: transactions successfully retrieved
+      body:
+        $ref: '#/definitions/Transaction'
+  TransactionDetailedResponse:
+    type: object
+    properties:
+      status: 
+        type: integer
+        example: 200
+      message:
+        type: string
+        example: transactions successfully retrieved
+      body:
+        allOf:
+          - $ref: '#/definitions/Transaction'
+          - $ref: '#/definitions/ExtraTransactionInfos'
